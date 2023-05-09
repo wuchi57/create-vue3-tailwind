@@ -4,8 +4,13 @@ import prompts from 'prompts'
 import fs from 'fs-extra'
 import chalk from 'chalk'
 import {validatePkgName, install} from './utils/index.js'
+import { fileURLToPath} from 'node:url'
 
-const __dirname = path.resolve()
+const templateDir = path.resolve(
+    fileURLToPath(import.meta.url),
+    '../',
+    `template-vue3-tailwind`,
+)
 
 const pkgName = process.argv[2] === undefined ? 'vue3-tailwind' : process.argv[2]
 validatePkgName(pkgName)
@@ -58,7 +63,7 @@ async function getOptions () {
 
 async function copyFiles (options) {
   const {name, description} = options
-  fs.copySync(path.resolve(__dirname, './template-vue3-tailwind'), dir)
+  fs.copySync(templateDir, dir)
   await fs.writeFileSync(path.resolve(dir, 'README.md'), `# ${name}\n\n${description}\n`)
   // 修改package.json
   const pkgPath = path.resolve(dir, 'package.json')
