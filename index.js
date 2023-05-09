@@ -7,7 +7,7 @@ import {validatePkgName, install} from './utils/index.js'
 
 const __dirname = path.resolve()
 
-const pkgName = process.argv[2]
+const pkgName = process.argv[2] === undefined ? 'vue3-tailwind' : process.argv[2]
 validatePkgName(pkgName)
 const dir = path.resolve(pkgName.startsWith('@') ? pkgName.split('/')[1] : pkgName)
 await init(dir)

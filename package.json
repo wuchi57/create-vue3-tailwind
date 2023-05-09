@@ -6,6 +6,10 @@
   "bin": {
     "create-vue3-tailwind": "./index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wuchi57/create-vue3-tailwind.git"
+  },
   "license": "MIT",
   "dependencies": {
     "chalk": "^5.2.0",
