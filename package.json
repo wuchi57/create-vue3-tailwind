@@ -6,6 +6,12 @@
   "bin": {
     "create-vue3-tailwind": "./index.js"
   },
+  "keywords": [
+    "project",
+    "template",
+    "vue3",
+    "tailwindcss"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wuchi57/create-vue3-tailwind.git"
