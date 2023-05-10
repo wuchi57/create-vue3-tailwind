@@ -1,7 +1,10 @@
-# 创建项目模版
+# Project Template
 
 
+
+A project template base on vue3 + tailwindcss + vue-router + pinia + axios
+
+### How to use?
 ```shell
-git init -b main
-yarn add chalk fs-extra prompts validate-npm-package-name
+yarn create vue3-tailwind
 ```
