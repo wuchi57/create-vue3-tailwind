@@ -11,7 +11,8 @@
     "template",
     "vite",
     "vue3",
-    "tailwindcss"
+    "tailwindcss",
+    "element-plus"
   ],
   "repository": {
     "type": "git",
