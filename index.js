@@ -31,6 +31,12 @@ async function getOptions () {
       initial: '这是一个项目模版',
     },
     {
+      message: '是否需要使用ElementPlus?',
+      name: 'useElementPlus',
+      type: 'confirm',
+      initial: true,
+    },
+    {
       name: "packageManager",
       type: "select",
       choices: ["yarn", "pnpm", "npm"].map((i) => ({ title: i, value: i })),
@@ -54,7 +60,8 @@ async function validateDir (dir) {
     const { yes } = await prompts({
       name: 'yes',
       type: 'confirm',
-      message: chalk.bold('您是否需要覆盖已存在的目录？')
+      message: chalk.bold('您是否需要覆盖已存在的目录？'),
+      initial: true,
     })
     if (!yes) process.exit(1)
     await fs.remove(dir)
@@ -63,12 +70,16 @@ async function validateDir (dir) {
 }
 
 async function copyFiles (options, dir, pkgName) {
-  const templateDir = path.resolve(
+  const {name, description, useElementPlus} = options
+  const templateDir = useElementPlus ? path.resolve(
+      fileURLToPath(import.meta.url),
+      '../',
+      `template-vue3-tailwind-element`,
+  ) : path.resolve(
       fileURLToPath(import.meta.url),
       '../',
       `template-vue3-tailwind`,
   )
-  const {name, description} = options
   fs.copySync(templateDir, dir)
   await fs.writeFileSync(path.resolve(dir, 'README.md'), `# ${name === undefined ? pkgName : name}\n\n${description}\n`)
   // 修改package.json
