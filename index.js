@@ -6,46 +6,21 @@ import chalk from 'chalk'
 import {validatePkgName, install} from './utils/index.js'
 import { fileURLToPath} from 'node:url'
 
-const templateDir = path.resolve(
-    fileURLToPath(import.meta.url),
-    '../',
-    `template-vue3-tailwind`,
-)
+await init()
 
-const pkgName = process.argv[2] === undefined ? 'vue3-tailwind' : process.argv[2]
-validatePkgName(pkgName)
-const dir = path.resolve(pkgName.startsWith('@') ? pkgName.split('/')[1] : pkgName)
-await init(dir)
-
-async function init (dir) {
-  await createDir()
+async function init () {
   const options = await getOptions()
-  await copyFiles(options)
+  let pkgName = process.argv[2] === undefined ? options.name : process.argv[2]
+  validatePkgName(pkgName)
+  const dir = path.resolve(pkgName.startsWith('@') ? pkgName.split('/')[1] : pkgName)
+  await validateDir(pkgName)
+  await copyFiles(options, dir)
   install(options.packageManager, dir)
   console.log(`${chalk.green("✔")} Success! Created ${chalk.cyan(pkgName)} at ${chalk.cyan(dir)}`)
 }
 
-async function createDir () {
-  if (fs.pathExistsSync(dir)) {
-    const { yes } = await prompts({
-      name: 'yes',
-      type: 'confirm',
-      message: chalk.bold('您是否需要覆盖已存在的目录？')
-    })
-    if (!yes) process.exit(1)
-    await fs.remove(dir)
-  }
-  fs.mkdirpSync(dir, {})
-}
-
 async function getOptions () {
-  return await prompts([
-    {
-      message: '项目名称',
-      name: 'name',
-      type: 'text',
-      initial: pkgName,
-    },
+  let questions = [
     {
       message: '项目描述',
       name: 'description',
@@ -58,10 +33,38 @@ async function getOptions () {
       choices: ["yarn", "pnpm", "npm"].map((i) => ({ title: i, value: i })),
       message: "请选择要使用的包管理工具",
     },
-  ])
+  ]
+  if (process.argv[2] === undefined) {
+    questions.unshift({
+      message: '项目名称',
+      name: 'name',
+      type: 'text',
+      initial: 'vue3-tailwind',
+    })
+  }
+  return await prompts(questions)
 }
 
-async function copyFiles (options) {
+async function validateDir (dir) {
+  if (fs.pathExistsSync(dir)) {
+    console.log(chalk.bold(`目录 ${dir} 已存在`))
+    const { yes } = await prompts({
+      name: 'yes',
+      type: 'confirm',
+      message: chalk.bold('您是否需要覆盖已存在的目录？')
+    })
+    if (!yes) process.exit(1)
+    await fs.remove(dir)
+  }
+  fs.mkdirpSync(dir, {})
+}
+
+async function copyFiles (options, dir) {
+  const templateDir = path.resolve(
+      fileURLToPath(import.meta.url),
+      '../',
+      `template-vue3-tailwind`,
+  )
   const {name, description} = options
   fs.copySync(templateDir, dir)
   await fs.writeFileSync(path.resolve(dir, 'README.md'), `# ${name}\n\n${description}\n`)
