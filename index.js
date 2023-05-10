@@ -14,9 +14,12 @@ async function init () {
   validatePkgName(pkgName)
   const dir = path.resolve(pkgName.startsWith('@') ? pkgName.split('/')[1] : pkgName)
   await validateDir(pkgName)
-  await copyFiles(options, dir)
+  await copyFiles(options, dir, pkgName)
   install(options.packageManager, dir)
   console.log(`${chalk.green("✔")} Success! Created ${chalk.cyan(pkgName)} at ${chalk.cyan(dir)}`)
+  console.log('\nDone. Now run: \n')
+  console.log(`    cd ${pkgName}`)
+  console.log(`    ${options.packageManager} run dev\n`)
 }
 
 async function getOptions () {
@@ -59,7 +62,7 @@ async function validateDir (dir) {
   fs.mkdirpSync(dir, {})
 }
 
-async function copyFiles (options, dir) {
+async function copyFiles (options, dir, pkgName) {
   const templateDir = path.resolve(
       fileURLToPath(import.meta.url),
       '../',
@@ -67,11 +70,11 @@ async function copyFiles (options, dir) {
   )
   const {name, description} = options
   fs.copySync(templateDir, dir)
-  await fs.writeFileSync(path.resolve(dir, 'README.md'), `# ${name}\n\n${description}\n`)
+  await fs.writeFileSync(path.resolve(dir, 'README.md'), `# ${name === undefined ? pkgName : name}\n\n${description}\n`)
   // 修改package.json
   const pkgPath = path.resolve(dir, 'package.json')
   const json = JSON.parse(fs.readFileSync(pkgPath))
-  json.name = name
+  json.name = name === undefined ? pkgName : name
   json.description = description
   fs.writeFileSync(pkgPath, JSON.stringify(json, null, 2) + '\n')
   // 重命名_开头的文件
