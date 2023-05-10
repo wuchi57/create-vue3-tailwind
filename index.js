@@ -74,4 +74,12 @@ async function copyFiles (options, dir) {
   json.name = name
   json.description = description
   fs.writeFileSync(pkgPath, JSON.stringify(json, null, 2) + '\n')
+  // 重命名_开头的文件
+  const renameFiles = {
+    _gitignore: '.gitignore',
+    _env: '.env'
+  }
+  Object.keys(renameFiles).forEach(key => {
+    fs.moveSync(path.resolve(dir, key), path.resolve(dir, renameFiles[key]), {overwrite: true})
+  })
 }
